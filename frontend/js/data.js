@@ -1,0 +1,96 @@
+// data.js — coin constants and demo/fallback data
+
+const COINS = {
+  PEPE:    { name: 'Pepe',        emoji: '🐸',  color: '#4ade80', bgColor: 'rgba(74,222,128,0.15)'  },
+  DOGE:    { name: 'Dogecoin',    emoji: '🐕',  color: '#facc15', bgColor: 'rgba(250,204,21,0.15)'  },
+  WIF:     { name: 'WIF',         emoji: '🎩',  color: '#a78bfa', bgColor: 'rgba(167,139,250,0.15)' },
+  SHIB:    { name: 'Shiba Inu',   emoji: '🐕‍🦺', color: '#fb923c', bgColor: 'rgba(251,146,60,0.15)'  },
+  BONK:    { name: 'Bonk',        emoji: '🏏',  color: '#f87171', bgColor: 'rgba(248,113,113,0.15)' },
+  FLOKI:   { name: 'Floki',       emoji: '⚡',  color: '#fbbf24', bgColor: 'rgba(251,191,36,0.15)'  },
+  MEME:    { name: 'Memecoin',    emoji: '😂',  color: '#34d399', bgColor: 'rgba(52,211,153,0.15)'  },
+  BRETT:   { name: 'Brett',       emoji: '🟦',  color: '#60a5fa', bgColor: 'rgba(96,165,250,0.15)'  },
+  POPCAT:  { name: 'Popcat',      emoji: '🐱',  color: '#f472b6', bgColor: 'rgba(244,114,182,0.15)' },
+  MOG:     { name: 'Mog Coin',    emoji: '😼',  color: '#c084fc', bgColor: 'rgba(192,132,252,0.15)' },
+  TURBO:   { name: 'Turbo',       emoji: '🚀',  color: '#fb923c', bgColor: 'rgba(251,146,60,0.15)'  },
+  PNUT:    { name: 'Peanut',      emoji: '🥜',  color: '#d97706', bgColor: 'rgba(217,119,6,0.15)'   },
+  GOAT:    { name: 'Goat',        emoji: '🐐',  color: '#86efac', bgColor: 'rgba(134,239,172,0.15)' },
+  NEIRO:   { name: 'Neiro',       emoji: '🐶',  color: '#fca5a5', bgColor: 'rgba(252,165,165,0.15)' },
+  BABYDOGE:{ name: 'Baby Doge',   emoji: '🍼',  color: '#fde68a', bgColor: 'rgba(253,230,138,0.15)' },
+  MYRO:    { name: 'Myro',        emoji: '🐾',  color: '#67e8f9', bgColor: 'rgba(103,232,249,0.15)' },
+  BOME:    { name: 'Book of Meme',emoji: '📖',  color: '#a3e635', bgColor: 'rgba(163,230,53,0.15)'  },
+  SLERF:   { name: 'Slerf',       emoji: '😴',  color: '#93c5fd', bgColor: 'rgba(147,197,253,0.15)' },
+  MOODENG: { name: 'Moo Deng',    emoji: '🦛',  color: '#86efac', bgColor: 'rgba(134,239,172,0.15)' },
+};
+
+const DEMO_DATA = [
+  {
+    coin: 'PEPE', hype_score: 85.2, sentiment_avg: 0.78, mention_count: 42180,
+    trend_label: 'Rising', change_1h: 4.2, change_24h: 18.7, change_7d: 42.1,
+    change_1h_pct: 4.2, change_24h_pct: 18.7, change_7d_pct: 42.1,
+    engagement: '9.4x', engagement_24h: 9.4, sentiment_pct: 78,
+    price_usd: 0.00001284, volume_24h: 1200000000, news_count: 14,
+    btc_signal: '🚀 BUY', btc_confidence: 82,
+    timestamp: new Date().toISOString(),
+    sparkline: [30, 32, 28, 35, 40, 42, 38, 45, 52, 58, 62, 70],
+  },
+  {
+    coin: 'DOGE', hype_score: 72.1, sentiment_avg: 0.65, mention_count: 28640,
+    trend_label: 'Rising', change_1h: 1.8, change_24h: 7.4, change_7d: 21.3,
+    change_1h_pct: 1.8, change_24h_pct: 7.4, change_7d_pct: 21.3,
+    engagement: '6.1x', engagement_24h: 6.1, sentiment_pct: 65,
+    price_usd: 0.1642, volume_24h: 2000000000, news_count: 9,
+    btc_signal: '👀 WATCH', btc_confidence: 55,
+    timestamp: new Date().toISOString(),
+    sparkline: [40, 42, 44, 43, 45, 48, 47, 50, 52, 54, 58, 62],
+  },
+  {
+    coin: 'WIF', hype_score: 63.4, sentiment_avg: 0.55, mention_count: 18220,
+    trend_label: 'Rising', change_1h: -0.5, change_24h: 3.1, change_7d: 12.8,
+    change_1h_pct: -0.5, change_24h_pct: 3.1, change_7d_pct: 12.8,
+    engagement: '4.8x', engagement_24h: 4.8, sentiment_pct: 55,
+    price_usd: 2.31, volume_24h: 300000000, news_count: 5,
+    btc_signal: '👀 WATCH', btc_confidence: 42,
+    timestamp: new Date().toISOString(),
+    sparkline: [35, 33, 36, 34, 38, 40, 42, 44, 46, 48, 50, 55],
+  },
+  {
+    coin: 'SHIB', hype_score: 58.0, sentiment_avg: 0.48, mention_count: 15890,
+    trend_label: 'Flat', change_1h: -1.2, change_24h: -2.4, change_7d: 5.6,
+    change_1h_pct: -1.2, change_24h_pct: -2.4, change_7d_pct: 5.6,
+    engagement: '3.9x', engagement_24h: 3.9, sentiment_pct: 48,
+    price_usd: 0.000009124, volume_24h: 800000000, news_count: 3,
+    btc_signal: '😐 HOLD', btc_confidence: 28,
+    timestamp: new Date().toISOString(),
+    sparkline: [60, 58, 62, 55, 52, 58, 54, 50, 52, 48, 46, 50],
+  },
+  {
+    coin: 'BONK', hype_score: 47.3, sentiment_avg: 0.38, mention_count: 9410,
+    trend_label: 'Flat', change_1h: -2.1, change_24h: -5.8, change_7d: -8.2,
+    change_1h_pct: -2.1, change_24h_pct: -5.8, change_7d_pct: -8.2,
+    engagement: '2.7x', engagement_24h: 2.7, sentiment_pct: 38,
+    price_usd: 0.00002041, volume_24h: 500000000, news_count: 2,
+    btc_signal: '❌ AVOID', btc_confidence: 15,
+    timestamp: new Date().toISOString(),
+    sparkline: [55, 52, 48, 50, 44, 42, 38, 40, 36, 34, 32, 30],
+  },
+];
+
+const TICKER_ALERTS = [
+  { icon: '🔔', text: 'Add AI Alert', type: 'action' },
+  { icon: '🔥', text: 'PEPE mentions up 340% in last hour', type: 'alert' },
+  { icon: '🚀', text: 'Why is DOGE pumping today?', type: 'info' },
+  { icon: '📊', text: 'Are meme coins outperforming BTC?', type: 'info' },
+  { icon: '📡', text: 'WIF hits 3-day high on Reddit', type: 'alert' },
+  { icon: '⚡', text: 'BONK whale wallet spotted accumulating', type: 'alert' },
+  { icon: '💎', text: 'What coins are trending this week?', type: 'info' },
+  { icon: '🔥', text: 'SHIB volume spike detected', type: 'alert' },
+  { icon: '🚀', text: 'PEPE 7-day change hits +42%', type: 'info' },
+];
+
+const GLOBAL_METRICS = {
+  total_mentions: 25166, total_change: 12.4,
+  avg_hype_score: 70.5,  hype_change: 3.1,
+  hype_meter: 66,        hype_label: 'High Hype',
+  sentiment_pct: 69,     sentiment_label: 'Bullish across Reddit',
+  sentiment_pos: 0.72,   trend_strength: 77.5, trend_label: 'SURGING',
+};
