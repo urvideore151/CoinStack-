@@ -1,0 +1,117 @@
+<!-- pages/coin-detail.html — Full coin drill-down -->
+<div style="padding: 24px 20px; max-width: 900px;">
+ 
+  <!-- Back button -->
+  <div style="margin-bottom:16px;">
+    <button id="detail-back" onclick="navigate('top')" style="display:inline-flex;align-items:center;gap:6px;padding:6px 12px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;color:var(--text-secondary);cursor:pointer;">
+      ← Back to Trending
+    </button>
+  </div>
+ 
+  <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
+    <div id="detail-avatar" style="width:52px;height:52px;border-radius:50%;background:rgba(74,222,128,0.15);display:flex;align-items:center;justify-content:center;font-size:26px">🐸</div>
+    <div>
+      <div style="font-size:22px;font-weight:700;" id="detail-name">—</div>
+      <div style="font-size:13px;color:var(--text-muted);" id="detail-symbol">—</div>
+    </div>
+    <div id="detail-score-badge" class="score-badge flat" style="margin-left:12px;font-size:16px">— —</div>
+  </div>
+ 
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;">
+    <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">Price (USD)</div>
+      <div style="font-size:16px;font-weight:700;font-family:var(--font-mono)" id="detail-price">—</div>
+    </div>
+    <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">Mentions 24h</div>
+      <div style="font-size:20px;font-weight:700;font-family:var(--font-mono)" id="detail-mentions">—</div>
+    </div>
+    <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">Sentiment</div>
+      <div style="font-size:20px;font-weight:700;color:var(--color-up)" id="detail-sentiment">78% Positive</div>
+    </div>
+    <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">Engagement</div>
+      <div style="font-size:20px;font-weight:700;font-family:var(--font-mono)" id="detail-engagement">9.4x</div>
+    </div>
+    <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;">
+      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:6px">7d Change</div>
+      <div style="font-size:20px;font-weight:700;color:var(--color-up)" id="detail-7d">+42.1%</div>
+    </div>
+  </div>
+ 
+  <!-- Hype chart -->
+  <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:20px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Hype Score — Last 24 Hours</div>
+    <div style="position:relative;height:180px;">
+      <canvas id="hype-time-chart"></canvas>
+    </div>
+  </div>
+ 
+  <!-- Sentiment breakdown -->
+  <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Sentiment Breakdown</div>
+    <div style="position:relative;height:120px;">
+      <canvas id="sentiment-chart"></canvas>
+    </div>
+  </div>
+</div>
+ 
+<script>
+(async () => {
+  const symbol = window.selectedCoin || 'BTC';
+  const coin = await fetchCoinDetail(symbol);
+  if (!coin) {
+    document.querySelector('div[style]').innerHTML = `<div style="padding:40px;color:var(--text-muted)">Coin "${symbol}" not found.</div>`;
+    return;
+  }
+ 
+  // Use COINS map if available, otherwise build a generic meta
+  const meta = (typeof COINS !== 'undefined' && COINS[coin.coin]) || {
+    name:    coin.coin,
+    emoji:   '🪙',
+    color:   '#4d7cff',
+    bgColor: 'rgba(77,124,255,0.15)',
+  };
+ 
+  // Back button
+  const backBtn = document.getElementById('detail-back');
+  if (backBtn) backBtn.addEventListener('click', () => history.back() || navigate('top'));
+ 
+  // Header
+  document.getElementById('detail-name').textContent    = meta.name || coin.coin;
+  document.getElementById('detail-symbol').textContent  = coin.coin;
+  document.getElementById('detail-avatar').innerHTML    = `<span style="font-size:26px">${meta.emoji}</span>`;
+  document.getElementById('detail-avatar').style.background = meta.bgColor;
+ 
+  // Badge
+  const badge = document.getElementById('detail-score-badge');
+  const tc = getTrendClass(coin.hype_score);
+  badge.className   = `score-badge ${tc}`;
+  badge.textContent = getTrendIcon(coin.hype_score) + ' ' + coin.hype_score.toFixed(1);
+ 
+  // Stats
+  document.getElementById('detail-mentions').textContent  = fmtNumber(coin.mention_count);
+  document.getElementById('detail-sentiment').textContent = (coin.sentiment_pct || 0) + '% Positive';
+  document.getElementById('detail-engagement').textContent = coin.engagement || '—';
+ 
+  const c7El = document.getElementById('detail-7d');
+  const c7   = coin.change_7d || 0;
+  c7El.textContent = (c7 >= 0 ? '+' : '') + c7.toFixed(1) + '%';
+  c7El.style.color = c7 >= 0 ? 'var(--color-up)' : 'var(--color-down)';
+ 
+  // Price row (if element exists)
+  const priceEl = document.getElementById('detail-price');
+  if (priceEl && coin.price_usd) {
+    priceEl.textContent = '$' + Number(coin.price_usd).toLocaleString(undefined, {maximumFractionDigits: 6});
+  }
+ 
+  // Charts
+  buildHypeTimeChart('hype-time-chart', coin, meta.color);
+  const pos = coin.sentiment_pct || 50;
+  const neg = Math.round((100 - pos) * 0.4);
+  const neu = 100 - pos - neg;
+  buildSentimentChart('sentiment-chart', pos, neu, neg);
+})();
+</script>

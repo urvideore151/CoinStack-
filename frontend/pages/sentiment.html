@@ -1,0 +1,81 @@
+<!-- pages/sentiment.html — Sentiment analysis overview -->
+<div style="padding: 24px 20px; max-width: 900px;">
+  <div style="font-size:16px;font-weight:600;margin-bottom:20px;">Sentiment Analysis</div>
+
+  <!-- Cards per coin -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-bottom:24px;" id="sentiment-cards"></div>
+
+  <!-- Overall chart -->
+  <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:14px">Overall Sentiment Distribution</div>
+    <div style="position:relative;height:200px">
+      <canvas id="overall-sent-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const cards = document.getElementById('sentiment-cards');
+  cards.innerHTML = DEMO_DATA.map(coin => {
+    const meta = COINS[coin.coin] || { emoji:'🪙', bgColor:'rgba(255,255,255,0.1)', color:'#fff' };
+    const pos = coin.sentiment_pct;
+    const neg = Math.round((100 - pos) * 0.4);
+    const neu = 100 - pos - neg;
+    return `
+      <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span style="font-size:20px">${meta.emoji}</span>
+          <span style="font-weight:600">${meta.name}</span>
+          <span style="font-size:11px;color:var(--text-muted)">${coin.coin}</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:center">
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#22c55e">${pos}%</div>
+            <div style="font-size:10px;color:var(--text-muted)">Positive</div>
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#8b90a0">${neu}%</div>
+            <div style="font-size:10px;color:var(--text-muted)">Neutral</div>
+          </div>
+          <div>
+            <div style="font-size:18px;font-weight:700;color:#ef4444">${neg}%</div>
+            <div style="font-size:10px;color:var(--text-muted)">Negative</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;height:4px;border-radius:99px;overflow:hidden;display:flex">
+          <div style="width:${pos}%;background:#22c55e"></div>
+          <div style="width:${neu}%;background:#8b90a0"></div>
+          <div style="width:${neg}%;background:#ef4444"></div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Build overall sentiment chart
+  setTimeout(() => {
+    const ctx = document.getElementById('overall-sent-chart');
+    if (!ctx || typeof Chart === 'undefined') return;
+    const labels = DEMO_DATA.map(c => c.coin);
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Positive', data: DEMO_DATA.map(c => c.sentiment_pct), backgroundColor: '#22c55e', borderRadius: 4 },
+          { label: 'Neutral',  data: DEMO_DATA.map(c => { const pos = c.sentiment_pct; const neg = Math.round((100-pos)*0.4); return 100-pos-neg; }), backgroundColor: '#8b90a0', borderRadius: 4 },
+          { label: 'Negative', data: DEMO_DATA.map(c => Math.round((100 - c.sentiment_pct) * 0.4)), backgroundColor: '#ef4444', borderRadius: 4 },
+        ],
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        scales: {
+          x: { stacked: true, grid: { display: false }, ticks: { color: '#8b90a0', font: { size: 11 } }, border: { color: 'rgba(255,255,255,0.05)' } },
+          y: { stacked: true, max: 100, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8b90a0', font: { size: 11 }, callback: v => v + '%' }, border: { color: 'rgba(255,255,255,0.05)' } },
+        },
+        plugins: { legend: { display: false } },
+      },
+    });
+  }, 100);
+})();
+</script>

@@ -1,0 +1,61 @@
+<!-- pages/overview.html — Treemap + Social charts overview -->
+<div style="padding: 24px 20px;">
+  <div style="font-size:16px;font-weight:600;margin-bottom:20px;">Market Overview</div>
+
+  <!-- Treemap (canvas-based) -->
+  <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;margin-bottom:20px;">
+    <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:12px">Hype Share by Coin</div>
+    <div style="display:grid;grid-template-columns:3fr 2fr;grid-template-rows:1fr 1fr;gap:8px;height:200px;" id="treemap">
+    </div>
+  </div>
+
+  <!-- Multi-coin line chart -->
+  <div style="background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-size:12px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.04em">Hype Score — 7 Day Trend</div>
+      <div style="display:flex;gap:12px;">
+        ${DEMO_DATA.map(c => {const meta = COINS[c.coin] || { color:'#fff', name: c.coin };
+          return `<span style="display:flex;align-items:center;gap:4px;font-size:11px;color:#8b90a0"><span style="width:10px;height:3px;border-radius:99px;background:${meta.color};display:inline-block"></span>${c.coin}</span>`;
+        }).join('')}
+      </div>
+    </div>
+    <div style="position:relative;height:220px;">
+      <canvas id="overview-chart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Treemap
+  const treemap = document.getElementById('treemap');
+  const total = DEMO_DATA.reduce((s, c) => s + c.hype_score, 0);
+  treemap.innerHTML = DEMO_DATA.map((coin, i) => {
+    const meta = COINS[coin.coin] || { emoji:'🪙', color:'#fff', name: coin.coin };
+    const pct = Math.round(coin.hype_score / total * 100);
+    const trendCls = getTrendClass(coin.hype_score);
+    const styles = [
+      'grid-column:1/2;grid-row:1/3;',
+      'grid-column:2/3;grid-row:1/2;',
+      '',
+      '',
+      '',
+    ];
+    return `
+      <div style="${styles[i] || ''}background:${meta.color}18;border:1px solid ${meta.color}30;border-radius:var(--radius-lg);padding:14px;display:flex;flex-direction:column;justify-content:space-between;cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='${meta.color}28'" onmouseout="this.style.background='${meta.color}18'">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:${i===0?'22':'16'}px">${meta.emoji}</span>
+          <span style="font-weight:600;font-size:${i===0?'15':'13'}px">${coin.coin}</span>
+        </div>
+        <div>
+          <div style="font-size:${i===0?'28':'20'}px;font-weight:700;color:${meta.color};font-family:var(--font-mono)">${coin.hype_score.toFixed(1)}</div>
+          <div style="font-size:10px;color:var(--text-muted)">${pct}% share</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Overview chart
+  setTimeout(() => buildOverviewChart('overview-chart'), 100);
+})();
+</script>

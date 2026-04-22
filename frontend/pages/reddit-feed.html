@@ -1,0 +1,99 @@
+<!-- pages/reddit-feed.html — Live Reddit posts -->
+<div style="padding: 24px 20px; max-width: 860px;">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
+    <div style="font-size:16px;font-weight:600;">Live Reddit Feed</div>
+    <div style="font-size:11px;padding:3px 8px;background:rgba(255,69,0,0.12);color:#ff4500;border-radius:var(--radius-sm);font-weight:600;border:1px solid rgba(255,69,0,0.2)">● LIVE</div>
+  </div>
+
+  <!-- Coin filter pills -->
+  <div style="display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;" id="coin-pills">
+    <button onclick="filterFeed('ALL')" class="feed-pill active" data-coin="ALL">All Coins</button>
+    <button onclick="filterFeed('PEPE')" class="feed-pill" data-coin="PEPE">🐸 PEPE</button>
+    <button onclick="filterFeed('DOGE')" class="feed-pill" data-coin="DOGE">🐕 DOGE</button>
+    <button onclick="filterFeed('WIF')"  class="feed-pill" data-coin="WIF">🎩 WIF</button>
+    <button onclick="filterFeed('SHIB')" class="feed-pill" data-coin="SHIB">🐕‍🦺 SHIB</button>
+    <button onclick="filterFeed('BONK')" class="feed-pill" data-coin="BONK">🔥 BONK</button>
+  </div>
+
+  <div id="feed-list" style="display:flex;flex-direction:column;gap:10px;"></div>
+</div>
+
+<style>
+.feed-pill {
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-light);
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.feed-pill.active, .feed-pill:hover {
+  background: rgba(77,124,255,0.1);
+  border-color: rgba(77,124,255,0.3);
+  color: #4d7cff;
+}
+.sent-tag {
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sent-tag.positive { background:rgba(34,197,94,0.12);  color:#22c55e; }
+.sent-tag.neutral  { background:rgba(139,144,160,0.12);color:#8b90a0; }
+.sent-tag.negative { background:rgba(239,68,68,0.12);  color:#ef4444; }
+</style>
+
+<script>
+const FEED_POSTS = [
+  { coin:'PEPE', title:'PEPE is mooning right now!! 🐸🚀', sub:'r/CryptoCurrency',   upvotes:2840, sentiment:'positive', time:'2m ago' },
+  { coin:'DOGE', title:'Just bought more DOGE, WAGMI 🚀',  sub:'r/dogecoin',          upvotes:1240, sentiment:'positive', time:'5m ago' },
+  { coin:'WIF',  title:'WIF technical analysis — cup and handle forming?', sub:'r/CryptoMoonShots', upvotes:890, sentiment:'neutral', time:'12m ago' },
+  { coin:'PEPE', title:'PEPE 24h chart looking very bullish', sub:'r/SatoshiStreetBets', upvotes:760, sentiment:'positive', time:'15m ago' },
+  { coin:'SHIB', title:'Is SHIB a good long-term hold in 2025?', sub:'r/shib',         upvotes:540, sentiment:'neutral', time:'18m ago' },
+  { coin:'BONK', title:'BONK dumping — should I sell?',    sub:'r/CryptoMoonShots',   upvotes:210, sentiment:'negative', time:'24m ago' },
+  { coin:'DOGE', title:'Elon tweeted a DOGE meme again 💀', sub:'r/dogecoin',          upvotes:3200, sentiment:'positive', time:'28m ago' },
+  { coin:'WIF',  title:'WIF Reddit mentions tripled in 24h', sub:'r/CryptoCurrency',   upvotes:480, sentiment:'positive', time:'35m ago' },
+  { coin:'BONK', title:'Bought BONK at the top like an idiot', sub:'r/SatoshiStreetBets', upvotes:1100, sentiment:'negative', time:'40m ago' },
+  { coin:'PEPE', title:'PEPE community is the strongest in crypto', sub:'r/CryptoCurrency', upvotes:920, sentiment:'positive', time:'45m ago' },
+];
+
+let currentFilter = 'ALL';
+
+function filterFeed(coin) {
+  currentFilter = coin;
+  document.querySelectorAll('.feed-pill').forEach(p => p.classList.toggle('active', p.dataset.coin === coin));
+  renderFeed();
+}
+
+function renderFeed() {
+  const posts = currentFilter === 'ALL' ? FEED_POSTS : FEED_POSTS.filter(p => p.coin === currentFilter);
+  const list = document.getElementById('feed-list');
+  list.innerHTML = posts.map(p => {
+    const meta = COINS[p.coin] || { emoji:'🪙', bgColor:'rgba(255,255,255,0.1)' };
+    return `
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);cursor:pointer;transition:background 0.15s;" onmouseover="this.style.background='var(--bg-hover)'" onmouseout="this.style.background='var(--bg-tertiary)'">
+        <div style="width:32px;height:32px;border-radius:50%;background:${meta.bgColor};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${meta.emoji}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;margin-bottom:4px;line-height:1.4">${p.title}</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-muted)">
+            <span style="color:#ff4500">●</span>
+            <span>${p.sub}</span>
+            <span>·</span>
+            <span>▲ ${p.upvotes.toLocaleString()} upvotes</span>
+            <span>·</span>
+            <span>${p.time}</span>
+          </div>
+        </div>
+        <div class="sent-tag ${p.sentiment}">${p.sentiment}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+renderFeed();
+</script>

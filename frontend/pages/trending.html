@@ -1,0 +1,26 @@
+<!-- pages/trending.html — Coin leaderboard table -->
+<div class="coin-table-wrap">
+  <table class="coin-table">
+    <thead>
+      <tr>
+        <th><div class="th-inner">#</div></th>
+        <th><div class="th-inner">Name ⇅</div></th>
+        <th><div class="th-inner">Hype Score ⇅</div></th>
+        <th><div class="th-inner">1h % ⇅</div></th>
+        <th><div class="th-inner">24h % ⇅</div></th>
+        <th><div class="th-inner">7d % ⇅</div></th>
+        <th><div class="th-inner"><span class="th-info">i</span> Mentions(24h) ⇅</div></th>
+        <th><div class="th-inner"><span class="th-info">i</span> Sentiment ⇅</div></th>
+        <th><div class="th-inner"><span class="th-info">i</span> Engagement ⇅</div></th>
+        <th><div class="th-inner">Last 24h</div></th>
+      </tr>
+    </thead>
+    <tbody id="coin-tbody"></tbody>
+  </table>
+</div>
+<script>
+(async () => {
+  const coins = await fetchScoredCoins();
+  renderCoinTable(coins);
+})();
+</script>
