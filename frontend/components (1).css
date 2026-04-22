@@ -1,0 +1,328 @@
+/* components.css — metric cards, table, badges, sparklines */
+
+/* ── Metric cards row ───────────────────────────── */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: 1px solid var(--border);
+}
+
+.metric-card {
+  padding: 14px 20px;
+  border-right: 1px solid var(--border);
+  background: var(--bg-secondary);
+  cursor: pointer;
+  transition: background 0.15s;
+  min-height: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.metric-card:last-child { border-right: none; }
+.metric-card:hover { background: var(--bg-hover); }
+
+.metric-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 6px;
+}
+.metric-label-arrow {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.metric-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.1;
+  font-family: var(--font-mono);
+  margin-bottom: 4px;
+}
+
+.metric-change {
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.metric-change.up   { color: var(--color-up); }
+.metric-change.down { color: var(--color-down); }
+.metric-change.flat { color: var(--color-flat); }
+
+.metric-sparkline {
+  margin-top: 8px;
+  height: 40px;
+  position: relative;
+}
+
+/* Gauge card */
+.metric-gauge-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 0;
+}
+
+/* Sentiment bar */
+.sentiment-bar-wrap { margin-top: 8px; }
+.sentiment-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+.sentiment-track {
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(to right, #ef4444 0%, #f59e0b 40%, #22c55e 80%);
+  position: relative;
+}
+.sentiment-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-secondary);
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: left 0.5s ease;
+}
+
+/* Trend strength bar */
+.trend-bar-wrap { margin-top: 8px; }
+.trend-track {
+  height: 6px;
+  border-radius: 99px;
+  background: linear-gradient(to right, var(--text-muted) 0%, var(--color-flat) 50%, var(--accent-green) 100%);
+  position: relative;
+}
+.trend-thumb {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--text-primary);
+  border: 2px solid var(--bg-secondary);
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.trend-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: var(--radius-sm);
+  background: rgba(245,200,66,0.15);
+  color: var(--color-flat);
+  border: 1px solid rgba(245,200,66,0.25);
+  letter-spacing: 0.05em;
+  margin-top: 4px;
+}
+
+/* ── Coin table ─────────────────────────────────── */
+.coin-table-wrap {
+  overflow-x: auto;
+  background: var(--bg-secondary);
+}
+
+.coin-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.coin-table thead tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.coin-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.coin-table th:hover { color: var(--text-secondary); }
+.coin-table th .th-inner {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.th-info {
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  border: 1px solid var(--text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.coin-table td {
+  padding: 14px 14px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+.coin-table tbody tr {
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.coin-table tbody tr:hover { background: var(--bg-hover); }
+
+/* Rank */
+.col-rank {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 500;
+  width: 36px;
+  text-align: center;
+}
+
+/* Name cell */
+.coin-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coin-avatar {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+  position: relative;
+}
+.coin-avatar::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.12);
+}
+
+.coin-name-group { display: flex; flex-direction: column; gap: 0; }
+.coin-full-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+.coin-symbol { font-size: 11px; color: var(--text-muted); font-weight: 400; margin-left: 4px; }
+
+.hype-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+.hype-pill.rising  { background: rgba(34,197,94,0.12);  color: var(--color-up);   border: 1px solid rgba(34,197,94,0.25);  }
+.hype-pill.flat    { background: rgba(245,158,11,0.12); color: var(--color-flat); border: 1px solid rgba(245,158,11,0.25); }
+.hype-pill.falling { background: rgba(239,68,68,0.12);  color: var(--color-down); border: 1px solid rgba(239,68,68,0.25);  }
+
+/* Score badge (table column) */
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.score-badge.rising  { background: rgba(34,197,94,0.15);  color: var(--color-up);   border: 1px solid rgba(34,197,94,0.3);  }
+.score-badge.flat    { background: rgba(245,158,11,0.15); color: var(--color-flat); border: 1px solid rgba(245,158,11,0.3); }
+.score-badge.falling { background: rgba(239,68,68,0.15);  color: var(--color-down); border: 1px solid rgba(239,68,68,0.3);  }
+
+/* Change cells */
+.change-up   { color: var(--color-up);   font-weight: 600; }
+.change-down { color: var(--color-down); font-weight: 600; }
+.change-flat { color: var(--color-flat); font-weight: 600; }
+.change-arrow { font-size: 10px; }
+
+/* Mentions */
+.col-mentions {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-primary);
+}
+
+/* Sentiment bar in table */
+.sentiment-cell { min-width: 100px; }
+.sent-pct {
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.sent-bar-track {
+  height: 4px;
+  border-radius: 99px;
+  background: var(--bg-primary);
+  overflow: hidden;
+}
+.sent-bar-fill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.6s ease;
+}
+
+/* Engagement */
+.col-engagement {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+/* Sparkline cell */
+.sparkline-cell { width: 120px; }
+canvas.sparkline { display: block; }
+
+/* ── Gauge SVG ──────────────────────────────────── */
+.gauge-value {
+  font-size: 28px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  text-anchor: middle;
+  fill: var(--text-primary);
+}
+.gauge-label-text {
+  font-size: 10px;
+  text-anchor: middle;
+  fill: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+/* ── Responsive ─────────────────────────────────── */
+@media (max-width: 1200px) {
+  .metrics-row { grid-template-columns: repeat(3, 1fr); }
+  .metric-card:nth-child(3) { border-right: none; }
+}
+@media (max-width: 768px) {
+  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  .metric-card:nth-child(2) { border-right: none; }
+}
