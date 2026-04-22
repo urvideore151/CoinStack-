@@ -1,0 +1,39 @@
+<!-- pages/alerts.html — Hype alerts feed -->
+<div style="padding: 24px 20px; max-width: 860px;">
+  <div style="font-size:16px;font-weight:600;margin-bottom:16px;">Hype Alerts</div>
+
+  <div id="alerts-list" style="display:flex;flex-direction:column;gap:10px;">
+  </div>
+</div>
+
+<script>
+(function() {
+  const ALERTS_DATA = [
+    { coin:'PEPE', icon:'🔥', text:'PEPE mentions up 340% in last hour', type:'spike',  time:'2m ago',  severity:'high' },
+    { coin:'DOGE', icon:'🚀', text:'DOGE pump detected — 7.4% in 24h',    type:'pump',   time:'5m ago',  severity:'medium' },
+    { coin:'WIF',  icon:'📡', text:'WIF hits 3-day high on Reddit',        type:'trend',  time:'12m ago', severity:'medium' },
+    { coin:'BONK', icon:'⚡', text:'BONK whale wallet spotted accumulating', type:'whale',time:'18m ago', severity:'high' },
+    { coin:'SHIB', icon:'📊', text:'SHIB sentiment dropped below 50%',     type:'drop',   time:'25m ago', severity:'low' },
+    { coin:'PEPE', icon:'💎', text:'PEPE community engagement 9.4x average', type:'engagement','time':'31m ago', severity:'medium' },
+    { coin:'DOGE', icon:'🔔', text:'DOGE weekly change crosses +21%',      type:'milestone','time':'44m ago',severity:'low' },
+  ];
+
+  const severityColors = { high:'#ef4444', medium:'#f59e0b', low:'#22c55e' };
+  const severityBg     = { high:'rgba(239,68,68,0.1)', medium:'rgba(245,158,11,0.1)', low:'rgba(34,197,94,0.1)' };
+
+  const list = document.getElementById('alerts-list');
+  list.innerHTML = ALERTS_DATA.map(a => {
+    const meta = COINS[a.coin] || { bgColor:'rgba(255,255,255,0.1)' };
+    return `
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--bg-tertiary);border:1px solid var(--border);border-radius:var(--radius-lg);border-left:3px solid ${severityColors[a.severity]};">
+        <div style="width:36px;height:36px;border-radius:50%;background:${meta.bgColor};display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">${a.icon}</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:500;margin-bottom:2px">${a.text}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${a.coin} · ${a.time}</div>
+        </div>
+        <div style="padding:3px 8px;border-radius:var(--radius-sm);background:${severityBg[a.severity]};color:${severityColors[a.severity]};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.04em">${a.severity}</div>
+      </div>
+    `;
+  }).join('');
+})();
+</script>
