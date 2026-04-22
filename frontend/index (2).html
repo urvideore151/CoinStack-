@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CoinStack — Meme Coin Hype Dashboard</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+
+<!-- ── Brand bar ──────────────────────────────── -->
+<div class="brand-bar">
+  <span class="brand-logo">CoinStack</span>
+</div>
+
+<!-- ── Primary navbar ─────────────────────────── -->
+<nav class="navbar">
+  <span class="navbar-brand">CoinStack</span>
+  <span class="nav-item active" data-route="top">Top</span>
+  <span class="nav-item" data-route="trending">Trending</span>
+  <span class="nav-item" data-route="watchlist">Watchlist</span>
+  <span class="nav-item" data-route="alerts">Hype Alerts</span>
+  <span class="nav-item" data-route="active">Most Active</span>
+
+  <div class="nav-spacer"></div>
+  <div class="nav-clock">
+    <div class="nav-dot"></div>
+    <span id="clock">17:39:29</span>
+  </div>
+</nav>
+
+<!-- ── Metric cards ────────────────────────────── -->
+<div class="metrics-row" id="metrics-row">
+
+  <!-- Total Mentions -->
+  <div class="metric-card">
+    <div class="metric-label">Total Mentions <span class="metric-label-arrow">›</span></div>
+    <div class="metric-value" id="m-mentions">25,166</div>
+    <div class="metric-change up" id="m-mentions-chg">▲ 12.4%</div>
+    <div class="metric-sparkline">
+      <canvas class="sparkline" id="spark-mentions" style="width:100%;height:40px"></canvas>
+    </div>
+  </div>
+
+  <!-- Avg Hype Score -->
+  <div class="metric-card">
+    <div class="metric-label">Avg Hype Score <span class="metric-label-arrow">›</span></div>
+    <div class="metric-value" id="m-hype">70.5</div>
+    <div class="metric-change up" id="m-hype-chg">▲ 3.1%</div>
+    <div class="metric-sparkline">
+      <canvas class="sparkline" id="spark-hype" style="width:100%;height:40px"></canvas>
+    </div>
+  </div>
+
+  <!-- Hype Meter (gauge) -->
+  <div class="metric-card" style="align-items:center">
+    <div class="metric-label" style="align-self:flex-start">Hype Meter <span class="metric-label-arrow">›</span></div>
+    <div style="display:flex;flex-direction:column;align-items:center;margin-top:4px">
+      <svg id="gauge-svg" width="120" height="70"></svg>
+    </div>
+  </div>
+
+  <!-- Sentiment -->
+  <div class="metric-card">
+    <div class="metric-label">Sentiment <span class="metric-label-arrow">›</span></div>
+    <div class="metric-value" style="font-size:20px" id="m-sentiment">69% Positive</div>
+    <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px" id="m-sentiment-sub">Bullish across Reddit</div>
+    <div class="sentiment-bar-wrap">
+      <div class="sentiment-labels">
+        <span>Bearish</span><span>Neutral</span><span>Bullish</span>
+      </div>
+      <div class="sentiment-track">
+        <div class="sentiment-thumb" id="sentiment-thumb" style="left:72%"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trend Strength -->
+  <div class="metric-card">
+    <div class="metric-label">Trend Strength <span class="metric-label-arrow">›</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+      <div class="metric-value" style="font-size:20px">77.5</div>
+      <div class="trend-badge">🔥 SURGING</div>
+    </div>
+    <div class="trend-bar-wrap">
+      <div class="trend-track">
+        <div class="trend-thumb" style="left:77.5%"></div>
+      </div>
+      <div class="sentiment-labels" style="margin-top:4px">
+        <span>Weak</span><span>Moderate</span><span>Strong</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Ticker / alert bar ──────────────────────── -->
+<div class="ticker-bar">
+  <button class="ticker-add-btn">🔔 Add AI Alert <span class="ticker-close">✕</span></button>
+  <div class="ticker-scroll">
+    <div class="ticker-scroll-inner" id="ticker-inner">
+      <!-- populated by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ── Source filter bar ───────────────────────── -->
+<div class="filter-bar">
+  <button class="source-btn active" data-source="reddit">
+    <span class="source-dot" style="width:7px;height:7px;border-radius:50%;background:#ff4500;display:inline-block"></span>
+    Reddit
+  </button>
+  <button class="source-btn" data-source="twitter">
+    <span class="source-dot" style="width:7px;height:7px;border-radius:50%;background:#1d9bf0;display:inline-block"></span>
+    Twitter/X
+  </button>
+  <button class="source-btn" data-source="telegram">
+    <span class="source-dot" style="width:7px;height:7px;border-radius:50%;background:#2aabee;display:inline-block"></span>
+    Telegram
+  </button>
+  <button class="source-btn" data-source="discord">
+    <span class="source-dot" style="width:7px;height:7px;border-radius:50%;background:#7289da;display:inline-block"></span>
+    Discord
+  </button>
+
+  <div class="filter-spacer"></div>
+
+  <!-- Hype Score sort dropdown -->
+  <div class="hype-sort-wrap" id="hype-sort-wrap">
+    <button class="sort-btn active" id="hype-sort-btn" onclick="toggleHypeDropdown()">
+      <span class="sort-icon">▼</span> Hype Score: <span id="hype-sort-label">High to Low</span>
+    </button>
+    <div class="hype-dropdown" id="hype-dropdown" style="display:none;">
+      <div class="hype-dropdown-item active" onclick="setHypeSort('desc')">▼ High to Low</div>
+      <div class="hype-dropdown-item" onclick="setHypeSort('asc')">▲ Low to High</div>
+    </div>
+  </div>
+
+  <button class="sort-btn" id="filters-btn" onclick="toggleFilterPanel()">⊙ Filters <span id="filter-active-badge" style="display:none;background:#4d7cff;color:#fff;border-radius:99px;font-size:10px;padding:1px 6px;margin-left:4px">0</span></button>
+</div>
+
+<!-- ── Filter Panel ────────────────────────────── -->
+<div id="filter-panel" style="display:none; background:var(--bg-secondary); border-bottom:1px solid var(--border-light); padding:16px 20px;">
+
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+    <div style="font-size:13px; font-weight:600; color:var(--text-primary);">Filter by Signal Component</div>
+    <div style="display:flex; gap:8px;">
+      <button onclick="resetFilters()" style="padding:5px 12px;font-size:11px;color:var(--text-secondary);border:1px solid var(--border);border-radius:var(--radius-md);background:transparent;cursor:pointer;">Reset All</button>
+      <button onclick="applyFilters()" style="padding:5px 12px;font-size:11px;color:#fff;border:none;border-radius:var(--radius-md);background:#4d7cff;cursor:pointer;font-weight:600;">Apply</button>
+    </div>
+  </div>
+
+  <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px;">
+
+    <!-- Mentions 25% -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <div>
+          <div class="filter-card-title">📢 Mentions</div>
+          <div class="filter-card-sub">Reddit post volume · Weight 25%</div>
+        </div>
+        <div class="filter-weight-pill">25%</div>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Min</span>
+        <input type="range" id="f-mentions-min" min="0" max="100000" step="1000" value="0" oninput="updateFilterLabel('mentions-min',this.value,'K',1000)">
+        <span class="filter-val" id="lbl-mentions-min">0</span>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Max</span>
+        <input type="range" id="f-mentions-max" min="0" max="100000" step="1000" value="100000" oninput="updateFilterLabel('mentions-max',this.value,'K',1000)">
+        <span class="filter-val" id="lbl-mentions-max">100K</span>
+      </div>
+    </div>
+
+    <!-- Sentiment 20% -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <div>
+          <div class="filter-card-title">💬 Sentiment</div>
+          <div class="filter-card-sub">VADER compound score · Weight 20%</div>
+        </div>
+        <div class="filter-weight-pill">20%</div>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Min %</span>
+        <input type="range" id="f-sentiment-min" min="0" max="100" step="1" value="0" oninput="updateFilterLabel('sentiment-min',this.value,'%',1)">
+        <span class="filter-val" id="lbl-sentiment-min">0%</span>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Max %</span>
+        <input type="range" id="f-sentiment-max" min="0" max="100" step="1" value="100" oninput="updateFilterLabel('sentiment-max',this.value,'%',1)">
+        <span class="filter-val" id="lbl-sentiment-max">100%</span>
+      </div>
+    </div>
+
+    <!-- Volume 20% -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <div>
+          <div class="filter-card-title">📊 Volume (24h)</div>
+          <div class="filter-card-sub">Trading volume USD · Weight 20%</div>
+        </div>
+        <div class="filter-weight-pill">20%</div>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Min</span>
+        <input type="range" id="f-volume-min" min="0" max="5000000000" step="100000000" value="0" oninput="updateFilterLabel('volume-min',this.value,'B',1000000000)">
+        <span class="filter-val" id="lbl-volume-min">$0</span>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Max</span>
+        <input type="range" id="f-volume-max" min="0" max="5000000000" step="100000000" value="5000000000" oninput="updateFilterLabel('volume-max',this.value,'B',1000000000)">
+        <span class="filter-val" id="lbl-volume-max">$5B+</span>
+      </div>
+    </div>
+
+    <!-- Momentum 15% -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <div>
+          <div class="filter-card-title">🚀 Momentum</div>
+          <div class="filter-card-sub">24h price change % · Weight 15%</div>
+        </div>
+        <div class="filter-weight-pill">15%</div>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Min %</span>
+        <input type="range" id="f-momentum-min" min="-50" max="50" step="1" value="-50" oninput="updateFilterLabel('momentum-min',this.value,'%',1)">
+        <span class="filter-val" id="lbl-momentum-min">-50%</span>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Max %</span>
+        <input type="range" id="f-momentum-max" min="-50" max="50" step="1" value="50" oninput="updateFilterLabel('momentum-max',this.value,'%',1)">
+        <span class="filter-val" id="lbl-momentum-max">+50%</span>
+      </div>
+    </div>
+
+    <!-- Engagement 10% -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <div>
+          <div class="filter-card-title">👍 Engagement</div>
+          <div class="filter-card-sub">Avg upvotes/comments · Weight 10%</div>
+        </div>
+        <div class="filter-weight-pill">10%</div>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Min</span>
+        <input type="range" id="f-engagement-min" min="0" max="10000" step="100" value="0" oninput="updateFilterLabel('engagement-min',this.value,'',1)">
+        <span class="filter-val" id="lbl-engagement-min">0</span>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Max</span>
+        <input type="range" id="f-engagement-max" min="0" max="10000" step="100" value="10000" oninput="updateFilterLabel('engagement-max',this.value,'',1)">
+        <span class="filter-val" id="lbl-engagement-max">10K+</span>
+      </div>
+    </div>
+
+    <!-- News 10% -->
+    <div class="filter-card">
+      <div class="filter-card-header">
+        <div>
+          <div class="filter-card-title">📰 News Count</div>
+          <div class="filter-card-sub">News articles found · Weight 10%</div>
+        </div>
+        <div class="filter-weight-pill">10%</div>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Min</span>
+        <input type="range" id="f-news-min" min="0" max="50" step="1" value="0" oninput="updateFilterLabel('news-min',this.value,'',1)">
+        <span class="filter-val" id="lbl-news-min">0</span>
+      </div>
+      <div class="filter-range-row">
+        <span class="filter-range-label">Max</span>
+        <input type="range" id="f-news-max" min="0" max="50" step="1" value="50" oninput="updateFilterLabel('news-max',this.value,'',1)">
+        <span class="filter-val" id="lbl-news-max">50+</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Trend label quick filter -->
+  <div style="margin-top:14px; display:flex; align-items:center; gap:10px;">
+    <span style="font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Trend:</span>
+    <button class="trend-filter-btn active" data-trend="all"  onclick="setTrendFilter(this)">All</button>
+    <button class="trend-filter-btn"        data-trend="Rising"   onclick="setTrendFilter(this)">🔥 Rising</button>
+    <button class="trend-filter-btn"        data-trend="Flat"  onclick="setTrendFilter(this)">➡️ Flat</button>
+    <button class="trend-filter-btn"        data-trend="Falling" onclick="setTrendFilter(this)">❄️ Falling</button>
+  </div>
+
+</div>
+
+<style>
+.hype-sort-wrap { position: relative; }
+.hype-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  min-width: 160px;
+  z-index: 200;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.hype-dropdown-item {
+  padding: 9px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.hype-dropdown-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.hype-dropdown-item.active { color: var(--accent-blue); background: rgba(77,124,255,0.08); }
+
+/* Filter panel */
+.filter-card {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+}
+.filter-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.filter-card-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+.filter-card-sub {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+.filter-weight-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 99px;
+  background: rgba(77,124,255,0.12);
+  color: #4d7cff;
+  border: 1px solid rgba(77,124,255,0.25);
+  white-space: nowrap;
+}
+.filter-range-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.filter-range-label {
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 32px;
+  flex-shrink: 0;
+}
+.filter-range-row input[type=range] {
+  flex: 1;
+  height: 3px;
+  accent-color: #4d7cff;
+}
+.filter-val {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  min-width: 36px;
+  text-align: right;
+  font-family: var(--font-mono);
+}
+.trend-filter-btn {
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 500;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.trend-filter-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+.trend-filter-btn.active {
+  background: rgba(77,124,255,0.12);
+  border-color: rgba(77,124,255,0.35);
+  color: #4d7cff;
+  font-weight: 600;
+}
+</style>
+
+<!-- ── Main content: coin table ───────────────── -->
+<div id="main-content">
+  <div class="coin-table-wrap">
+    <table class="coin-table">
+      <thead>
+        <tr>
+          <th><div class="th-inner">#</div></th>
+          <th><div class="th-inner">Name ⇅</div></th>
+          <th><div class="th-inner">Hype Score ⇅</div></th>
+          <th><div class="th-inner">1h % ⇅</div></th>
+          <th><div class="th-inner">24h % ⇅</div></th>
+          <th><div class="th-inner">7d % ⇅</div></th>
+          <th><div class="th-inner"><span class="th-info">i</span> Mentions(24h) ⇅</div></th>
+          <th><div class="th-inner"><span class="th-info">i</span> Sentiment ⇅</div></th>
+          <th><div class="th-inner"><span class="th-info">i</span> BTC Signal ⇅</div></th>
+          <th><div class="th-inner">Last 24h</div></th>
+        </tr>
+      </thead>
+      <tbody id="coin-tbody">
+        <!-- rows injected by JS -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="js/data.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/api.js"></script>
+<script src="js/charts.js"></script>
+<script src="js/router.js"></script>
+<script>
+
+/* ── Init ─────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+  startClock(document.getElementById('clock'));
+  buildTicker();
+  buildGaugeSVG();
+  buildMetricSparklines();
+
+  // ✅ FIX 1: Init router FIRST — wires up mainContent ref and nav click handlers
+  initRouter();
+
+  // ✅ FIX 2: Render table after initRouter (table stays, no page replace on load)
+  const coins = await fetchScoredCoins();
+  renderCoinTable(coins);
+
+  // Source filter toggle (multi-select)
+  document.querySelectorAll('.source-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      this.classList.toggle('active');
+    });
+  });
+
+  // Close hype dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('hype-sort-wrap')?.contains(e.target)) {
+      const dd = document.getElementById('hype-dropdown');
+      if (dd) dd.style.display = 'none';
+    }
+  });
+
+  // Auto-refresh every 30s — only when table is visible
+  setInterval(async () => {
+    if (document.getElementById('coin-tbody')) {
+      const data = await fetchScoredCoins();
+      renderCoinTable(data);
+    }
+  }, 30000);
+});
+
+/* ── Ticker ────────────────────────────────────── */
+function buildTicker() {
+  const inner = document.getElementById('ticker-inner');
+  // Duplicate for seamless loop
+  const items = [...TICKER_ALERTS, ...TICKER_ALERTS];
+  inner.innerHTML = items.map(item => `
+    <span class="ticker-item ${item.type === 'alert' ? 'ticker-alert' : ''}">
+      <span class="ticker-icon">${item.icon}</span>
+      ${item.text}
+    </span>
+  `).join('');
+}
+
+/* ── Gauge ─────────────────────────────────────── */
+function buildGaugeSVG() {
+  const svg = document.getElementById('gauge-svg');
+  drawGauge(svg, 66, 'High Hype');
+}
+
+/* ── Metric sparklines ─────────────────────────── */
+function buildMetricSparklines() {
+  const mentionData = [180, 200, 195, 210, 225, 230, 220, 240, 245, 250, 260, 252];
+  const hypoData   = [62, 64, 63, 66, 68, 70, 69, 71, 72, 70, 71, 70];
+
+  setTimeout(() => {
+    const c1 = document.getElementById('spark-mentions');
+    const c2 = document.getElementById('spark-hype');
+    if (c1) drawSparkline(c1, mentionData, '#22c55e');
+    if (c2) drawSparkline(c2, hypoData, '#22c55e');
+  }, 100);
+}
+
+/* ── Hype Score sort ───────────────────────────── */
+let hypeSortDir = 'desc'; // default: high to low
+let lastCoinsData = [];
+
+function toggleHypeDropdown() {
+  const dd = document.getElementById('hype-dropdown');
+  dd.style.display = dd.style.display === 'none' ? 'block' : 'none';
+}
+
+function setHypeSort(dir) {
+  hypeSortDir = dir;
+  document.getElementById('hype-sort-label').textContent = dir === 'desc' ? 'High to Low' : 'Low to High';
+  document.getElementById('hype-dropdown').style.display = 'none';
+  document.querySelectorAll('.hype-dropdown-item').forEach(el => {
+    el.classList.toggle('active', el.textContent.includes(dir === 'desc' ? 'High' : 'Low to High'));
+  });
+  // Re-render with new sort
+  if (lastCoinsData.length) renderCoinTable(lastCoinsData);
+}
+
+/* ── Filter Panel ──────────────────────────────── */
+let filterPanelOpen = false;
+let activeTrendFilter = 'all';
+let activeFilters = null; // null = no filters applied
+
+function toggleFilterPanel() {
+  filterPanelOpen = !filterPanelOpen;
+  document.getElementById('filter-panel').style.display = filterPanelOpen ? 'block' : 'none';
+  document.getElementById('filters-btn').classList.toggle('active', filterPanelOpen);
+}
+
+function updateFilterLabel(id, value, unit, divisor) {
+  const el = document.getElementById('lbl-' + id);
+  if (!el) return;
+  const num = parseFloat(value) / divisor;
+  if (unit === 'B') el.textContent = '$' + num.toFixed(1) + 'B';
+  else if (unit === 'K') el.textContent = num >= 1 ? num.toFixed(0) + 'K' : value;
+  else if (unit === '%') el.textContent = (parseFloat(value) >= 0 ? '+' : '') + parseFloat(value).toFixed(0) + '%';
+  else el.textContent = parseFloat(value) >= 1000 ? (parseFloat(value)/1000).toFixed(0)+'K' : value;
+}
+
+function setTrendFilter(btn) {
+  document.querySelectorAll('.trend-filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeTrendFilter = btn.dataset.trend;
+}
+
+function applyFilters() {
+  activeFilters = {
+    mentions:   { min: +document.getElementById('f-mentions-min').value,   max: +document.getElementById('f-mentions-max').value },
+    sentiment:  { min: +document.getElementById('f-sentiment-min').value,  max: +document.getElementById('f-sentiment-max').value },
+    volume:     { min: +document.getElementById('f-volume-min').value,     max: +document.getElementById('f-volume-max').value },
+    momentum:   { min: +document.getElementById('f-momentum-min').value,   max: +document.getElementById('f-momentum-max').value },
+    engagement: { min: +document.getElementById('f-engagement-min').value, max: +document.getElementById('f-engagement-max').value },
+    news:       { min: +document.getElementById('f-news-min').value,       max: +document.getElementById('f-news-max').value },
+    trend:      activeTrendFilter,
+  };
+
+  // Count active (non-default) filters for badge
+  let count = 0;
+  if (activeFilters.mentions.min > 0 || activeFilters.mentions.max < 100000) count++;
+  if (activeFilters.sentiment.min > 0 || activeFilters.sentiment.max < 100) count++;
+  if (activeFilters.volume.min > 0 || activeFilters.volume.max < 5000000000) count++;
+  if (activeFilters.momentum.min > -50 || activeFilters.momentum.max < 50) count++;
+  if (activeFilters.engagement.min > 0 || activeFilters.engagement.max < 10000) count++;
+  if (activeFilters.news.min > 0 || activeFilters.news.max < 50) count++;
+  if (activeFilters.trend !== 'all') count++;
+
+  const badge = document.getElementById('filter-active-badge');
+  badge.style.display = count > 0 ? 'inline' : 'none';
+  badge.textContent = count;
+
+  // Close panel and re-render
+  toggleFilterPanel();
+  if (lastCoinsData.length) renderCoinTable(lastCoinsData);
+}
+
+function resetFilters() {
+  activeFilters = null;
+  activeTrendFilter = 'all';
+
+  // Reset all sliders to defaults
+  document.getElementById('f-mentions-min').value   = 0;       updateFilterLabel('mentions-min',   0,         'K', 1000);
+  document.getElementById('f-mentions-max').value   = 100000;  updateFilterLabel('mentions-max',   100000,    'K', 1000);
+  document.getElementById('f-sentiment-min').value  = 0;       updateFilterLabel('sentiment-min',  0,         '%', 1);
+  document.getElementById('f-sentiment-max').value  = 100;     updateFilterLabel('sentiment-max',  100,       '%', 1);
+  document.getElementById('f-volume-min').value     = 0;       updateFilterLabel('volume-min',     0,         'B', 1000000000);
+  document.getElementById('f-volume-max').value     = 5000000000; updateFilterLabel('volume-max',  5000000000,'B', 1000000000);
+  document.getElementById('f-momentum-min').value   = -50;     updateFilterLabel('momentum-min',   -50,       '%', 1);
+  document.getElementById('f-momentum-max').value   = 50;      updateFilterLabel('momentum-max',   50,        '%', 1);
+  document.getElementById('f-engagement-min').value = 0;       updateFilterLabel('engagement-min', 0,         '',  1);
+  document.getElementById('f-engagement-max').value = 10000;   updateFilterLabel('engagement-max', 10000,     '',  1);
+  document.getElementById('f-news-min').value       = 0;       updateFilterLabel('news-min',       0,         '',  1);
+  document.getElementById('f-news-max').value       = 50;      updateFilterLabel('news-max',       50,        '',  1);
+
+  document.querySelectorAll('.trend-filter-btn').forEach(b => b.classList.toggle('active', b.dataset.trend === 'all'));
+  document.getElementById('filter-active-badge').style.display = 'none';
+
+  if (lastCoinsData.length) renderCoinTable(lastCoinsData);
+}
+
+function applyActiveFilters(coins) {
+  if (!activeFilters) return coins;
+  return coins.filter(c => {
+    const f = activeFilters;
+    if (c.mention_count  < f.mentions.min   || c.mention_count  > f.mentions.max)   return false;
+    if (c.sentiment_pct  < f.sentiment.min  || c.sentiment_pct  > f.sentiment.max)  return false;
+    if (c.volume_24h     < f.volume.min     || c.volume_24h     > f.volume.max)      return false;
+    if ((c.change_24h_pct || c.change_24h || 0) < f.momentum.min ||
+        (c.change_24h_pct || c.change_24h || 0) > f.momentum.max)                   return false;
+    if ((c.engagement_24h || 0) < f.engagement.min || (c.engagement_24h || 0) > f.engagement.max) return false;
+    if ((c.news_count || 0) < f.news.min    || (c.news_count || 0) > f.news.max)    return false;
+    if (f.trend !== 'all' && c.trend_label !== f.trend)                              return false;
+    return true;
+  });
+}
+
+
+function generateSparkline(baseScore, trend) {
+  const points = [];
+  let val = baseScore * 0.7;
+  for (let i = 0; i < 12; i++) {
+    val += (Math.random() - (trend === 'up' ? 0.3 : 0.6)) * 5;
+    val = Math.max(10, Math.min(100, val));
+    points.push(+val.toFixed(1));
+  }
+  return points;
+}
+
+/* ── Coin table ────────────────────────────────── */
+function renderCoinTable(coins) {
+  const tbody = document.getElementById('coin-tbody');
+  if (!tbody) return;
+
+  // Save for re-sort on dropdown change
+  lastCoinsData = coins;
+
+  // Apply filters first, then sort
+  const filtered = applyActiveFilters(coins);
+  const sorted = [...filtered].sort((a, b) =>
+    hypeSortDir === 'desc' ? b.hype_score - a.hype_score : a.hype_score - b.hype_score
+  );
+
+  if (sorted.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center;padding:40px;color:var(--text-muted);font-size:13px;">No coins match the current filters. <button onclick="resetFilters()" style="color:#4d7cff;background:none;border:none;cursor:pointer;font-size:13px;text-decoration:underline;">Reset filters</button></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = sorted.map((coin, i) => {
+    const meta = COINS[coin.coin] || { name: coin.coin, emoji: '🪙', color: '#fff', bgColor: 'rgba(255,255,255,0.1)' };
+    const trendClass = getTrendClass(coin.hype_score);
+    const trendIcon  = getTrendIcon(coin.hype_score);
+    const sentColor  = getSentimentColor(coin.sentiment_pct);
+    const c1  = coin.change_1h;
+    const c24 = coin.change_24h;
+    const c7  = coin.change_7d;
+    const sparkId = `spark-${coin.coin}`;
+
+    // Format price for display under coin name
+    const p = coin.price_usd || 0;
+    const priceStr = p === 0 ? '' :
+      p >= 1      ? '$' + p.toLocaleString(undefined, {maximumFractionDigits:4}) :
+      p >= 0.01   ? '$' + p.toFixed(4) :
+      p >= 0.0001 ? '$' + p.toFixed(6) :
+                    '$' + p.toExponential(2);
+
+    return `
+      <tr onclick="openCoinDetail('${coin.coin}')" style="cursor:pointer">
+        <td class="col-rank">${i + 1}</td>
+        <td>
+          <div class="coin-name-cell">
+            <div class="coin-avatar" style="background:${meta.bgColor}">
+              <span style="font-size:18px">${meta.emoji}</span>
+            </div>
+            <div class="coin-name-group">
+              <div>
+                <span class="coin-full-name">${meta.name}</span>
+                <span class="coin-symbol">${coin.coin}</span>
+              </div>
+              ${priceStr ? `<div style="font-size:11px;color:var(--text-muted);margin-top:1px">${priceStr}</div>` : ''}
+            </div>
+          </div>
+        </td>
+        <td>
+          <div class="score-badge ${trendClass}">${trendIcon} ${coin.hype_score.toFixed(1)}</div>
+        </td>
+        <td>${fmtChange(c1)}</td>
+        <td>${fmtChange(c24)}</td>
+        <td>${fmtChange(c7)}</td>
+        <td class="col-mentions">${fmtNumber(coin.mention_count)}</td>
+        <td class="sentiment-cell">
+          <div class="sent-pct" style="color:${sentColor}">${coin.sentiment_pct}%</div>
+          <div class="sent-bar-track">
+            <div class="sent-bar-fill" style="width:${coin.sentiment_pct}%;background:${sentColor}"></div>
+          </div>
+        </td>
+        <td style="font-size:12px;font-weight:600;color:${
+          (coin.btc_signal||'').includes('BUY')   ? '#22c55e' :
+          (coin.btc_signal||'').includes('WATCH')  ? '#f59e0b' :
+          (coin.btc_signal||'').includes('AVOID')  ? '#ef4444' :
+          'var(--text-muted)'}">${coin.btc_signal || '—'}</td>
+        <td class="sparkline-cell">
+          <canvas class="sparkline" id="${sparkId}" width="120" height="40"></canvas>
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  // Draw sparklines — fallback to generated data if backend sends empty array
+  setTimeout(() => {
+    sorted.forEach(coin => {
+      const canvas = document.getElementById(`spark-${coin.coin}`);
+      if (!canvas) return;
+      const sparkData = (Array.isArray(coin.sparkline) && coin.sparkline.length >= 2)
+        ? coin.sparkline
+        : generateSparkline(coin.hype_score, (coin.change_24h || 0) >= 0 ? 'up' : 'down');
+      const isUp = sparkData[sparkData.length - 1] >= sparkData[0];
+      drawSparkline(canvas, sparkData, isUp ? '#22c55e' : '#ef4444');
+    });
+  }, 50);
+}
+
+window.refreshDashboard = async () => {
+  const coins = await fetchScoredCoins();
+  renderCoinTable(coins);
+};
+
+</script>
+</body>
+</html>
